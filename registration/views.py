@@ -106,13 +106,26 @@ class StudentListView(LoginRequiredMixin,ListView):
 
 class StudentListUpdateView(UpdateView):
     model = Student
-fields = student_fields
-template_name_suffix = '_update_form'
-success_url = '/register/cirstaff/success/'
+    fields = student_fields
+    template_name_suffix = '_update_form'
+    success_url = '/register/cirstaff/success/'
 
-def get_object(self, queryset=None):
-    obj = Student.Objects.get(aums_id=self.kwargs['aums_id'])
-    if obj:
-        return obj
-    else:
-        raise Http404("That doesnt exist.")
+    def get_object(self, queryset=None):
+        obj = Student.Objects.get(aums_id=self.kwargs['aums_id'])
+        if obj:
+            return obj
+        else:
+            raise Http404("That doesnt exist.")
+
+
+class StudentFilterExternalView(ListView):
+    template_name = 'register/cirstaff/filter_external_list.html'
+
+    def get_queryset(self):
+        cgpa =self.request.GET.get('cgpa')
+        arrears = self.request.GET.get('arrear')
+        branch = self.request.GET.get('branch')
+        tenth = self.request.GET.get('tenth')
+        twelth = self.request.GET.get('twelth')
+
+        return Student.Objects.filter(cgpa__gte=cgpa, curr_arrears=arrears,branch=branch,tenth_mark__gte=tenth, twelth_mark__gte=twelth)
